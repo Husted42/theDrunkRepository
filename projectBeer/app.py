@@ -4,141 +4,39 @@ import psycopg2
 
 app = Flask(__name__)
 
-
 # set your own database
 db = "dbname='postgres' user='postgres' host='127.0.0.1' password = 'password'"
-
-
-##### Routes #####
-#Breweries
-#To add new route: '/Carlsberg', Carlsberg(),  brewery = 'Carlsberg'
-#And: Copy Carlsberg.html -> change name to [brewery].html
-@app.route('/Carlsberg')
-def carlsberg():
-    #Variables
-    brewery = 'Carlsberg'
-    imgLogo = "/static/assets/" + brewery + ".png"
-    
-    #Setup database
-    conn = psycopg2.connect(db)
-
-    #SQL
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM Beers WHERE brewery = '{}';".format(brewery))
-    beers = cur.fetchall()
-    cur.close()
-    conn.close()
-    return render_template(brewery + '.html', beers = beers, imgLogo = imgLogo)
-
-@app.route('/Svaneke')
-def Svaneke():
-    #Variables
-    brewery = 'Svaneke'
-    imgLogo = "/static/assets/" + brewery + ".png"
-    
-    #Setup database
-    conn = psycopg2.connect(db)
-
-    #SQL
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM Beers WHERE brewery = '{}';".format(brewery))
-    beers = cur.fetchall()
-    cur.close()
-    conn.close()
-    return render_template(brewery + '.html', beers = beers, imgLogo = imgLogo)
-
-@app.route('/Heineken')
-def Heineken():
-    #Variables
-    brewery = 'Heineken'
-    imgLogo = "/static/assets/" + brewery + ".png"
-    
-    #Setup database
-    conn = psycopg2.connect(db)
-
-    #SQL
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM Beers WHERE brewery = '{}';".format(brewery))
-    beers = cur.fetchall()
-    cur.close()
-    conn.close()
-    return render_template(brewery + '.html', beers = beers, imgLogo = imgLogo)
-
-@app.route('/Guinness')
-def Guinness():
-    #Variables
-    brewery = 'Guinness'
-    imgLogo = "/static/assets/" + brewery + ".png"
-    
-    #Setup database
-    conn = psycopg2.connect(db)
-
-    #SQL
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM Beers WHERE brewery = '{}';".format(brewery))
-    beers = cur.fetchall()
-    cur.close()
-    conn.close()
-    return render_template(brewery + '.html', beers = beers, imgLogo = imgLogo)
-
-@app.route('/Erdinger')
-def Erdinger():
-    #Variables
-    brewery = 'Erdinger'
-    imgLogo = "/static/assets/" + brewery + ".png"
-    
-    #Setup database
-    conn = psycopg2.connect(db)
-
-    #SQL
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM Beers WHERE brewery = '{}';".format(brewery))
-    beers = cur.fetchall()
-    cur.close()
-    conn.close()
-    return render_template(brewery + '.html', beers = beers, imgLogo = imgLogo)
-
-@app.route('/Mikkeller')
-def Mikkeller():
-    #Variables
-    brewery = 'Mikkeller'
-    imgLogo = "/static/assets/" + brewery + ".png"
-    
-    #Setup database
-    conn = psycopg2.connect(db)
-
-    #SQL
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM Beers WHERE brewery = '{}';".format(brewery))
-    beers = cur.fetchall()
-    cur.close()
-    conn.close()
-    return render_template(brewery + '.html', beers = beers, imgLogo = imgLogo)
 
 #Other
 @app.route('/')
 def home():
     return render_template('home.html')
 
-@app.route("/brewers")
+@app.route("/brewers", methods=('GET', 'POST'))
 def brew():
     conn = psycopg2.connect(db)
     cur = conn.cursor()
-    cur.execute('SELECT * FROM Breweries;')
-    Breweries = cur.fetchall()
-    cur.close()
-    conn.close()
-    return render_template('brew.html', Breweries = Breweries)
+    cur.execute('SELECT * FROM Beer;')
+    Beer = cur.fetchall() #Database of beers
+    cur.execute('SELECT * FROM country_table;')
+    country_table = cur.fetchall() #table of (key, name) of countries, used for dropdown menu. 
+    if request.method == 'POST':
+        if 'countries' in request.form: #Checks wich form is requsted (dropdown <--, search ...) 
+            country = request.form['countries']
+            cur.execute ("SELECT * FROM Beer WHERE country = '{}'".format(country))
+            Beer = cur.fetchall()
+            return render_template('brew.html', Beer = Beer, country_table=country_table)
+    return render_template('brew.html', Beer = Beer, country_table=country_table)
 
 @app.route("/test")
 def test():
     conn = psycopg2.connect(db)
     cur = conn.cursor()
-    cur.execute('SELECT * FROM Breweries;')
-    Breweries = cur.fetchall()
+    cur.execute('SELECT * FROM Beer;')
+    Beer = cur.fetchall()
     cur.close()
     conn.close()
-    return render_template('test.html', Breweries = Breweries)
+    return render_template('test.html', Beer = Beer)
 
 
 @app.route("/admin", methods=('GET', 'POST'))
