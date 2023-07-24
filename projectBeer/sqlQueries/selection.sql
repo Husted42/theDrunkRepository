@@ -1,0 +1,1 @@
+SELECT * FROM Beer ORDER BY brewer ASC;
