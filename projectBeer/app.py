@@ -1,13 +1,19 @@
+##### ----- Imports ----- #####
 import os
 from flask import Flask, render_template, request, url_for, redirect
 import psycopg2
 
+##### ----- Variables ----- #####
+# Flask constructor
 app = Flask(__name__)
 
 # set your own database
 db = "dbname='postgres' user='postgres' host='127.0.0.1' password = 'password'"
 
-#Other
+##### ----- plots ----- #####
+
+
+##### ----- Routes ----- #####
 @app.route('/')
 def home():
     return render_template('home.html')
