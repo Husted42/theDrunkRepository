@@ -1,7 +1,15 @@
 ##### ----- Imports ----- #####
 import os
+import pandas as pd
 from flask import Flask, render_template, request, url_for, redirect
 import psycopg2
+import numpy as np
+import matplotlib.pyplot as plt
+
+#scheduler
+import time
+import atexit
+from apscheduler.schedulers.background import BackgroundScheduler
 
 ##### ----- Variables ----- #####
 # Flask constructor
@@ -11,7 +19,46 @@ app = Flask(__name__)
 db = "dbname='postgres' user='postgres' host='127.0.0.1' password = 'password'"
 
 ##### ----- plots ----- #####
+def createDataframe():
+    conn = psycopg2.connect(db)
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM Beer;')
+    df = cur.fetchall()
+    df = pd.DataFrame(df, columns = ['brewer', 'name', 'alc', 'country', 'rating', 'price'])
+    print(type(df))
+    print(df)
+    return df
 
+def avgByCoun():
+    df = createDataframe()
+    keepers = df['country'].value_counts().reset_index()
+    keepers = keepers[keepers['count'] > 3]
+    keepers = list(keepers.pop('country'))
+
+    df_avgByCoun = df.groupby(['country'])['rating'].mean().reset_index()
+    df_avgByCoun = df_avgByCoun[df_avgByCoun['country'].isin(keepers)]
+    df_avgByCoun = df_avgByCoun.sort_values(by=['rating'])
+    df_avgByCoun['country'] = df_avgByCoun['country'].str.capitalize()
+    
+    default_x_ticks = (round(min(df_avgByCoun['rating']))) - 1, (round(max(df_avgByCoun['rating'])) + 1)
+    y = list(df_avgByCoun.pop('country'))
+    x = list(df_avgByCoun.pop('rating'))
+    plt.barh(width=x, y=y, color = 'Blue')
+    plt.xlim(default_x_ticks)
+    plt.title("Average rating based on Country")
+    plt.savefig('static/plots/avgByCoun.png')
+    print(default_x_ticks)
+    return default_x_ticks
+
+# Create the background scheduler
+scheduler = BackgroundScheduler()
+# Create the job
+scheduler.add_job(func=avgByCoun(), trigger="interval", seconds=3)
+# Start the scheduler
+scheduler.start()
+
+# /!\ IMPORTANT /!\ : Shut down the scheduler when exiting the app
+atexit.register(lambda: scheduler.shutdown())
 
 ##### ----- Routes ----- #####
 @app.route('/')
@@ -36,6 +83,7 @@ def brew():
 
 @app.route("/test")
 def test():
+    avgByCoun()
     conn = psycopg2.connect(db)
     cur = conn.cursor()
     cur.execute('SELECT * FROM Beer;')
