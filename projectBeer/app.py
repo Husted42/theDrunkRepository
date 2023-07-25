@@ -1,13 +1,19 @@
+##### ----- Imports ----- #####
 import os
 from flask import Flask, render_template, request, url_for, redirect
 import psycopg2
 
+##### ----- Variables ----- #####
+# Flask constructor
 app = Flask(__name__)
 
 # set your own database
 db = "dbname='postgres' user='postgres' host='127.0.0.1' password = 'password'"
 
-#Other
+##### ----- plots ----- #####
+
+
+##### ----- Routes ----- #####
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -38,7 +44,6 @@ def test():
     conn.close()
     return render_template('test.html', Beer = Beer)
 
-
 @app.route("/admin", methods=('GET', 'POST'))
 def admin():
     conn = psycopg2.connect(db)
@@ -52,8 +57,6 @@ def admin():
         cur.execute("INSERT INTO Beers(name, type, alc, description, brewery) VALUES ('{}', '{}', {}, '{}', '{}');".format(nm, typee, alc, desc, brew))
         conn.commit()
     return render_template('admin.html')
-
-
 
 if __name__ == "__main__":
     app.run(debug=True)

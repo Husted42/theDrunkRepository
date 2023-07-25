@@ -15,8 +15,9 @@ DELIMITER ','
 CSV HEADER
 encoding 'latin1';
 
+-- Table for dropdown form
 CREATE TABLE country_table AS
-SELECT country, CONCAT(UPPER(LEFT(country,1)),
+SELECT DISTINCT country, CONCAT(UPPER(LEFT(country,1)),
 LOWER(RIGHT(country,LENGTH(country)-1)))
-AS print FROM contry_table 
+AS print FROM Beer 
 ORDER BY print ASC;
