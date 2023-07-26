@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
+<!-- County and alcohol range -->
 <form method = "POST">
   <label for="countries">Choose a country:</label>
   <select id="countries" name="countries" placeholder="countries">
@@ -7,19 +8,35 @@
     <option value="{{ n[0] }}">{{ n[1] }}</option>
   {% endfor %}
   </select>
+  <p>
+    <label for="alcPer">and an alcohol range:</label> <br>
+    <input type="text" name="alcPer" id="alcPer" readonly style="font-weight:bold; width: 100px;">
+  </p>
+   
+  <div id="slider-range" style="width: 200px;"></div>
   <input type="submit" value = "submit" placeholder="submit">
 </form>
 
+<!-- Search for breweries -->
+<form method = "POST">
+  <label for="breweries">Search for breweries:</label>
+  <input id="breweries" type="text" name = "breweries" placeholder="string" />
+  <input type="submit" value = "submit" placeholder="submit">
+</form>
+
+
+
+
 {% for n in Beer %}
 <div >
-        <img src="/static/assets/{{ n[0] }}.png" alt="logotitle" width="20px" height="20px">
+        <!-- <img src="/static/assets/{{ n[0] }}.png" alt="Brewery logo" width="20px" height="20px"> -->
         <p>
           <!-- brewer  --> {{ n[0] }} 
           <!-- name --> {{ n[1] }} 
           <!-- alc --> {{ n[2] }} 
           <!-- county --> {{ n[3] }} 
           <!-- rating --> {{ n[4] }} 
-          <!-- price --> {{ n[5] }} 
+          <!-- price (maybe don't include: lot's of Nulls) --> {{ n[5] }} 
         </p>
 </div>
 {% endfor %}

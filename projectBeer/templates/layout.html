@@ -10,6 +10,30 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
 
+    <!-- jquery -->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    
+    <!-- range slider -->
+    <script>
+    $( function() {
+      $( "#slider-range" ).slider({
+        range: true,
+        min: 0,
+        max: 15,
+        values: [ 0, 15 ],
+        slide: function( event, ui ) {
+          $( "#alcPer" ).val(ui.values[ 0 ] + "% - " + ui.values[ 1 ] + "%" );
+        }
+      });
+      $( "#alcPer" ).val($( "#slider-range" ).slider( "values", 0 ) +
+        "% - " + $( "#slider-range" ).slider( "values", 1 ) + "%" );
+    } );
+    </script>
+    </head>
+
 </head>
 
 <!----- Navigation Bar ----->

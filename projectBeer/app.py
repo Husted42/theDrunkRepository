@@ -5,7 +5,7 @@ from flask import Flask, render_template, request, url_for, redirect
 import psycopg2
 import numpy as np
 import matplotlib.pyplot as plt
-
+import re
 
 #scheduler
 import time
@@ -106,11 +106,18 @@ scheduler = BackgroundScheduler()
 # Create the job
 scheduler.add_job(func=avgByCoun, trigger="interval", seconds=3600)
 scheduler.add_job(func=avgByBrew, trigger="interval", seconds=3600)
+scheduler.add_job(func=avgByBrew, trigger="interval", seconds=3600)
 # Start the scheduler
 scheduler.start()
 
 # /!\ IMPORTANT /!\ : Shut down the scheduler when exiting the app
 atexit.register(lambda: scheduler.shutdown())
+############### ---------- Functions ---------- ###############
+''' Cleans the string input from range slider on brewer page '''
+def cleanStringAlc(string):
+    m = re.sub(r'%', '', string)
+    m = re.findall(r'\d?\d', m)
+    return m[0], m[1]
 
 ############### ---------- Routes ---------- ###############
 @app.route('/')
@@ -126,9 +133,16 @@ def brew():
     cur.execute('SELECT * FROM country_table;')
     country_table = cur.fetchall() #table of (key, name) of countries, used for dropdown menu. 
     if request.method == 'POST':
-        if 'countries' in request.form: #Checks wich form is requsted (dropdown <--, search ...) 
+        if 'countries' in request.form: #Checks wich form is requsted (dropdown <--, searchBrew, searchBeer) 
+            alcPer = request.form['alcPer']
+            alcMin, alcMax = cleanStringAlc(alcPer)
             country = request.form['countries']
-            cur.execute ("SELECT * FROM Beer WHERE country = '{}'".format(country))
+            cur.execute ("SELECT * FROM Beer WHERE country = '{}' AND {} <= alc AND alc <= {}".format(country, alcMin, alcMax))
+            Beer = cur.fetchall()
+            return render_template('brew.html', Beer = Beer, country_table=country_table)
+        if 'breweries' in request.form: #Checks wich form is requsted (dropdown , searchBrew<--, searchBeer)
+            brewery = request.form['breweries']
+            cur.execute ("SELECT * FROM BEER WHERE LOWER(brewer) LIKE LOWER('%{}%')".format(brewery))
             Beer = cur.fetchall()
             return render_template('brew.html', Beer = Beer, country_table=country_table)
     return render_template('brew.html', Beer = Beer, country_table=country_table)
@@ -150,6 +164,7 @@ def admin():
     conn = psycopg2.connect(db)
     cur = conn.cursor()
     if request.method == 'POST':
+        for elm in request.form: print(elm)
         brewer = request.form['brewer']
         name = request.form['name']
         alc = request.form['alc']
