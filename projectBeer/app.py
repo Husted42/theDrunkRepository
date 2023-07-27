@@ -1,11 +1,15 @@
 ############### ---------- Imports ---------- ###############
+#Backend
 import os
-import pandas as pd
-from flask import Flask, render_template, request, url_for, redirect
+from flask import Flask, render_template, request, url_for, redirect, session
 import psycopg2
+import hashlib
+
+#Graphs
+import re
+import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import re
 
 #scheduler
 import time
@@ -16,10 +20,13 @@ from apscheduler.schedulers.background import BackgroundScheduler
 # Flask constructor
 app = Flask(__name__)
 
-# set your own database
+app.secret_key = 'OsmanAndJeppe'
+
+# Setup database: postgres
 db = "dbname='postgres' user='postgres' host='127.0.0.1' password = 'password'"
 
 ############### ---------- plots ---------- ###############
+''' Turns Beer table into dataframe '''
 def createDataframe():
     conn = psycopg2.connect(db)
     cur = conn.cursor()
@@ -40,12 +47,12 @@ def avgByCoun():
     df_avgByCoun = df_avgByCoun.sort_values(by=['rating'])
     df_avgByCoun['country'] = df_avgByCoun['country'].str.capitalize()
     
-    default_x_ticks = (round(min(df_avgByCoun['rating']))) - 1, (round(max(df_avgByCoun['rating'])) + 1)
+    xRange = (round(min(df_avgByCoun['rating']))) - 1, (round(max(df_avgByCoun['rating'])) + 1)
     y = list(df_avgByCoun.pop('country'))
     x = list(df_avgByCoun.pop('rating'))
     plt.figure(figsize=(10,6))
     plt.barh(width=x, y=y, color = 'Blue')
-    plt.xlim(default_x_ticks)
+    plt.xlim(xRange)
     plt.title("Average rating based on Country")
     plt.savefig('static/plots/avgByCoun.png')
 
@@ -104,9 +111,9 @@ def donoutChart():
 # Create a background scheduler, that runs every hour: 
 scheduler = BackgroundScheduler()
 # Create the job
-scheduler.add_job(func=avgByCoun, trigger="interval", seconds=3600)
-scheduler.add_job(func=avgByBrew, trigger="interval", seconds=3600)
-scheduler.add_job(func=avgByBrew, trigger="interval", seconds=3600)
+scheduler.add_job(func=avgByCoun, trigger="interval", seconds=7200)
+scheduler.add_job(func=avgByBrew, trigger="interval", seconds=7200)
+scheduler.add_job(func=avgByBrew, trigger="interval", seconds=7200)
 # Start the scheduler
 scheduler.start()
 
@@ -119,6 +126,16 @@ def cleanStringAlc(string):
     m = re.findall(r'\d?\d', m)
     return m[0], m[1]
 
+''' Returns number of diffrent brewers'''
+def getBrewerCount():
+    data = createDataframe()
+    return data['brewer'].unique().size
+
+''' Returns number of diffrent countries'''
+def getCountryCount():
+    data = createDataframe()
+    return data['country'].unique().size
+
 ############### ---------- Routes ---------- ###############
 @app.route('/')
 def home():
@@ -128,7 +145,7 @@ def home():
 def brew():
     conn = psycopg2.connect(db)
     cur = conn.cursor()
-    cur.execute('SELECT * FROM Beer;')
+    cur.execute('SELECT brewer, name, alc, CONCAT(UPPER(LEFT(country,1)),LOWER(RIGHT(country,LENGTH(country)-1))), rating FROM Beer ORDER BY rating DESC;')
     Beer = cur.fetchall() #Database of beers
     cur.execute('SELECT * FROM country_table;')
     country_table = cur.fetchall() #table of (key, name) of countries, used for dropdown menu. 
@@ -137,49 +154,84 @@ def brew():
             alcPer = request.form['alcPer']
             alcMin, alcMax = cleanStringAlc(alcPer)
             country = request.form['countries']
-            cur.execute ("SELECT * FROM Beer WHERE country = '{}' AND {} <= alc AND alc <= {}".format(country, alcMin, alcMax))
+            databaseQuery = "SELECT brewer, name, alc, CONCAT(UPPER(LEFT(country,1)),LOWER(RIGHT(country,LENGTH(country)-1))), rating FROM Beer WHERE country = '{}' AND {} <= alc AND alc <= {} ORDER BY rating DESC".format(country, alcMin, alcMax)
+            cur.execute (databaseQuery)
             Beer = cur.fetchall()
             return render_template('brew.html', Beer = Beer, country_table=country_table)
         if 'breweries' in request.form: #Checks wich form is requsted (dropdown , searchBrew<--, searchBeer)
             brewery = request.form['breweries']
-            cur.execute ("SELECT * FROM BEER WHERE LOWER(brewer) LIKE LOWER('%{}%')".format(brewery))
+            databaseQuery = "SELECT brewer, name, alc, CONCAT(UPPER(LEFT(country,1)),LOWER(RIGHT(country,LENGTH(country)-1))), rating FROM Beer WHERE LOWER(brewer) LIKE LOWER('%{}%') ORDER BY rating DESC".format(brewery)
+            cur.execute (databaseQuery)
             Beer = cur.fetchall()
             return render_template('brew.html', Beer = Beer, country_table=country_table)
-        if 'beerName' in request.form:
+        if 'beerName' in request.form: #Checks wich form is requsted (dropdown , searchBrew, searchBeer<--)
             beerName = request.form['beerName']
-            cur.execute ("SELECT * FROM BEER WHERE LOWER(name) LIKE LOWER('%{}%')".format(beerName))
+            databaseQuery = "SELECT brewer, name, alc, CONCAT(UPPER(LEFT(country,1)),LOWER(RIGHT(country,LENGTH(country)-1))), rating FROM Beer WHERE LOWER(name) LIKE LOWER('%{}%') ORDER BY rating DESC".format(beerName)
+            cur.execute (databaseQuery)
             Beer = cur.fetchall()
             return render_template('brew.html', Beer = Beer, country_table=country_table)
     return render_template('brew.html', Beer = Beer, country_table=country_table)
 
-@app.route("/test")
-def test():
-    conn = psycopg2.connect(db)
-    cur = conn.cursor()
-    cur.execute('SELECT * FROM Beer;')
-    Beer = cur.fetchall()
-    cur.close()
-    conn.close()
-    return render_template('test.html', Beer = Beer)
-
-#--> Admin page works as it should, but doesn't require login
-#--> Add login feature, only need one user: admin
 @app.route("/admin", methods=('GET', 'POST'))
 def admin():
-    conn = psycopg2.connect(db)
-    cur = conn.cursor()
-    if request.method == 'POST':
-        for elm in request.form: print(elm)
-        brewer = request.form['brewer']
-        name = request.form['name']
-        alc = request.form['alc']
-        country = request.form['country']
-        rating = request.form['rating']
-        brewer, name, country = brewer.lower(), name.lower(), country.lower()
-        cur.execute("INSERT INTO Beer(brewer, name, alc, country, rating) VALUES ('{}', '{}', {}, '{}', '{}');".format(brewer, name, alc, country, rating))
-        conn.commit()
+    if 'loggedin' in session:
+        conn = psycopg2.connect(db)
+        cur = conn.cursor()
+        if request.method == 'POST':
+            if 'brewer' in request.form:
+                brewer = request.form['brewer']
+                name = request.form['name']
+                alc = request.form['alc']
+                country = request.form['country']
+                rating = request.form['rating']
+                brewer, name, country = brewer.lower(), name.lower(), country.lower()
+                databaseQuery = "INSERT INTO Beer(brewer, name, alc, country, rating) VALUES ('{}', '{}', {}, '{}', '{}');".format(brewer, name, alc, country, rating)
+                cur.execute(databaseQuery)
+                conn.commit()
+                return render_template('admin.html')
+            if 'logout' in request.form:
+                return redirect(url_for('logout'))
+            else: 
+                return 'Error'
+    else:
+        return redirect(url_for('login'))
     return render_template('admin.html')
 
+############### ---------- Login/Logout ---------- ###############
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    msg = '' #has to be initialized otherwise render error in msg=msg
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
+        username = request.form['username']
+        password = request.form['password']
+        # Security:
+        password = password + 'boatsAreCool' #Non random salting
+        password = hashlib.md5(password.encode()) #Encode password
+        password = password.hexdigest() #convert password to string
+        # verification:
+        conn = psycopg2.connect(db)
+        cursor = conn.cursor()
+        databaseQuery = "SELECT * FROM account WHERE username = '{}' AND password = '{}'".format(username, password)
+        cursor.execute(databaseQuery)
+        account = cursor.fetchone() #Fetches a single record
+        if account:
+            # Create session data, we can access this data in other routes
+            session['loggedin'] = True
+            session['id'] = account[0]
+            session['username'] = account[1]
+            return redirect(url_for('admin'))
+        else:
+            msg = 'Incorrect username/password!'
+    return render_template('login.html', msg=msg)
+
+@app.route('/login/logout')
+def logout():
+    session.pop('loggedin', None)
+    session.pop('id', None)
+    session.pop('username', None)
+    return redirect(url_for('login'))
+
+############### ---------- Run ---------- ###############
 if __name__ == "__main__":
     #Function to run on startup
     avgByBrew()

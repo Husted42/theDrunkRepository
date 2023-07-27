@@ -117,3 +117,8 @@ div[class="content"] {
 .item1 {
     grid-row: 1/2 ;
 }
+
+/* Admin */
+.logoutBot{
+    margin-top: 15px;
+}
