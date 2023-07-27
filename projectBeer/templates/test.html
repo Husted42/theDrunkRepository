@@ -1,26 +1,42 @@
 {% extends "layout.html" %}
 {% block content %}
-{% for n in Breweries %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+  <script>
+  $( function() {
+    $( "#slider-range" ).slider({
+      range: true,
+      min: 0,
+      max: 15,
+      values: [ 0, 15 ],
+      slide: function( event, ui ) {
+        $( "#amount" ).val(ui.values[ 0 ] + "% - " + ui.values[ 1 ] + "%" );
+      }
+    });
+    $( "#amount" ).val($( "#slider-range" ).slider( "values", 0 ) +
+      "% - " + $( "#slider-range" ).slider( "values", 1 ) + "%" );
+  } );
+  </script>
+</head>
+<body>
+ 
+<p>
+  <label for="amount">Alcohol range:</label> <br>
+  <input type="text" id="amount" readonly style="font-weight:bold; width: 100px;">
+</p>
+ 
+<div id="slider-range" style="width: 200px;"></div>
+ 
+ 
+</body>
+</html>
 
-<div class="grid-container">
-    <div class="item1">
-        <img src="/static/assets/carlsberg.png" alt="logotitle" width="100%" height="100%">
-    </div>
-    <div class="item2">
-        <h1 style="font-size: 50px; text-align: center;"> 
-          <a href="{{ n[1] }}"> 
-            <div style="text-align: none; color: black; "> {{ n[1] }} </div>
-          </a> 
-        </h1>  <!-- Brewer Name -->
-    </div>
-    <div class="item3">
-        <p> <b> Location </b> <br> {{ n[2] }} </p>
-        <p> <b>Established: </b> <br> {{ n[3] }} </p>
-        <p id = "href"></p>
-    </div>  
-    <div class="item4">
-      {{ n[4] }}
-    </div>
-</div>
-{% endfor %}
+
 {% endblock content %}
