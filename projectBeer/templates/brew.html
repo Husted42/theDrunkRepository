@@ -37,14 +37,13 @@
 
 {% for n in Beer %}
 <div class="beerContainer">
-        <!-- <img src="/static/assets/{{ n[0] }}.png" alt="Brewery logo" width="20px" height="20px"> -->
+        <img src="/static/assets/{{ n[0] }}.png" alt="Brewery logo" width="100px" height="100px">
         <p>
           <!-- brewer  --> {{ n[0] }} 
           <!-- name -->    {{ n[1] }} 
           <!-- alc -->     {{ n[2] }} 
           <!-- county -->  {{ n[3] }} 
           <!-- rating -->  {{ n[4] }} 
-          <!-- price (maybe don't include: lot's of Nulls) --> {{ n[5] }} 
         </p>
 </div>
 {% endfor %}
