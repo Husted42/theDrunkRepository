@@ -1,0 +1,18 @@
+/* ##-----## filter systems ##-----## */
+.filterSystem {
+    border: 1px solid #000000;
+}
+
+.filterSystem1 {
+    border: 1px solid #757575;
+}
+
+.filterSystem2{
+    border: 1px solid #757575;
+}
+
+
+/* ##-----## print beers ##-----## */
+.beerContainer{
+    border: 1px solid #000000;
+}

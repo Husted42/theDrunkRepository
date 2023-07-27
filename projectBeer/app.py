@@ -145,6 +145,11 @@ def brew():
             cur.execute ("SELECT * FROM BEER WHERE LOWER(brewer) LIKE LOWER('%{}%')".format(brewery))
             Beer = cur.fetchall()
             return render_template('brew.html', Beer = Beer, country_table=country_table)
+        if 'beerName' in request.form:
+            beerName = request.form['beerName']
+            cur.execute ("SELECT * FROM BEER WHERE LOWER(name) LIKE LOWER('%{}%')".format(beerName))
+            Beer = cur.fetchall()
+            return render_template('brew.html', Beer = Beer, country_table=country_table)
     return render_template('brew.html', Beer = Beer, country_table=country_table)
 
 @app.route("/test")
