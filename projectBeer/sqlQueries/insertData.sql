@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS Beer;
 DROP TABLE IF EXISTS country_table;
+DROP TABLE IF EXISTS account;
 CREATE table Beer(brewer VARCHAR(265),
 				  name VARCHAR(265),
 				  alc NUMERIC,
@@ -7,6 +8,14 @@ CREATE table Beer(brewer VARCHAR(265),
 				  rating NUMERIC,
 				  price NUMERIC
 );
+
+CREATE table account(id SERIAL,
+					username VARCHAR(265),
+					password VARCHAR(265),
+					PRIMARY KEY(id)
+);
+INSERT INTO account(username, password) VALUES ('husted42', 'e177c5cfc7b27e9c4aa1549d01b372f6');
+
 
 -- the FROM line should be changed, to match correct dir
 COPY Beer(brewer, name, alc, country, rating, price)
