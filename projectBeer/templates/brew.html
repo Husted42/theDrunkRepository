@@ -5,6 +5,7 @@
   <form method = "POST" class = "filterSystem1">
     <label for="countries">Choose a country:</label>
     <select id="countries" name="countries" placeholder="countries">
+    <option value="All">All</option>
     {% for n in country_table %}
       <option value="{{ n[0] }}">{{ n[1] }}</option>
     {% endfor %}
