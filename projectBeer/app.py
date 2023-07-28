@@ -4,6 +4,7 @@ import os
 from flask import Flask, render_template, request, url_for, redirect, session
 import psycopg2
 import hashlib
+from datetime import datetime
 
 #Graphs
 import re
@@ -16,6 +17,7 @@ import time
 import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
 
+
 ############### ---------- Variables ---------- ###############
 # Flask constructor
 app = Flask(__name__)
@@ -24,6 +26,7 @@ app.secret_key = 'OsmanAndJeppe'
 
 # Setup database: postgres
 db = "dbname='postgres' user='postgres' host='127.0.0.1' password = 'password'"
+
 
 ############### ---------- plots ---------- ###############
 ''' Turns Beer table into dataframe '''
@@ -107,18 +110,7 @@ def donoutChart():
     ax.set_title("Distribution of beer count by country", y=1.05)
     plt.savefig('static/plots/donoutChart.png')
 
-##### ----- background scheduler ----- #####
-# Create a background scheduler, that runs every hour: 
-scheduler = BackgroundScheduler()
-# Create the job
-scheduler.add_job(func=avgByCoun, trigger="interval", seconds=7200)
-scheduler.add_job(func=avgByBrew, trigger="interval", seconds=7200)
-scheduler.add_job(func=avgByBrew, trigger="interval", seconds=7200)
-# Start the scheduler
-scheduler.start()
 
-# /!\ IMPORTANT /!\ : Shut down the scheduler when exiting the app
-atexit.register(lambda: scheduler.shutdown())
 ############### ---------- Functions ---------- ###############
 ''' Cleans the string input from range slider on brewer page '''
 def cleanStringAlc(string):
@@ -126,6 +118,16 @@ def cleanStringAlc(string):
     m = re.findall(r'\d?\d', m)
     return m[0], m[1]
 
+''' Backup table-Beer in a csv file'''
+def autoBackup():
+    data = createDataframe()
+    datetime_obj = datetime.now()
+    filename = str(datetime_obj.date()) + '.csv'
+    filepath = os.path.join(os.getcwd(), "backup")
+    filepath = filepath + '\\' + filename
+    data.to_csv(filepath, header=True)
+
+##### ----- Values for home page ----- #####
 ''' Returns number of diffrent brewers'''
 def getBrewerCount():
     data = createDataframe()
@@ -135,6 +137,22 @@ def getBrewerCount():
 def getCountryCount():
     data = createDataframe()
     return data['country'].unique().size
+
+
+############### ---------- background scheduler ---------- ###############
+# Create a background scheduler, that runs every hour: 
+scheduler = BackgroundScheduler()
+# Create the job
+scheduler.add_job(func=avgByCoun, trigger="interval", seconds=7200)
+scheduler.add_job(func=avgByBrew, trigger="interval", seconds=7200)
+scheduler.add_job(func=avgByBrew, trigger="interval", seconds=7200)
+scheduler.add_job(func=autoBackup, trigger="interval", seconds=604800)
+# Start the scheduler
+scheduler.start()
+
+# /!\ IMPORTANT /!\ : Shut down the scheduler when exiting the app
+atexit.register(lambda: scheduler.shutdown())
+
 
 ############### ---------- Routes ---------- ###############
 @app.route('/')
@@ -154,7 +172,10 @@ def brew():
             alcPer = request.form['alcPer']
             alcMin, alcMax = cleanStringAlc(alcPer)
             country = request.form['countries']
-            databaseQuery = "SELECT brewer, name, alc, CONCAT(UPPER(LEFT(country,1)),LOWER(RIGHT(country,LENGTH(country)-1))), rating FROM Beer WHERE country = '{}' AND {} <= alc AND alc <= {} ORDER BY rating DESC".format(country, alcMin, alcMax)
+            if country == 'All':
+                databaseQuery = "SELECT brewer, name, alc, CONCAT(UPPER(LEFT(country,1)),LOWER(RIGHT(country,LENGTH(country)-1))), rating FROM Beer WHERE {} <= alc AND alc <= {} ORDER BY rating DESC".format(alcMin, alcMax)
+            else:
+                databaseQuery = "SELECT brewer, name, alc, CONCAT(UPPER(LEFT(country,1)),LOWER(RIGHT(country,LENGTH(country)-1))), rating FROM Beer WHERE country = '{}' AND {} <= alc AND alc <= {} ORDER BY rating DESC".format(country, alcMin, alcMax)
             cur.execute (databaseQuery)
             Beer = cur.fetchall()
             return render_template('brew.html', Beer = Beer, country_table=country_table)
@@ -197,6 +218,7 @@ def admin():
         return redirect(url_for('login'))
     return render_template('admin.html')
 
+
 ############### ---------- Login/Logout ---------- ###############
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -206,7 +228,7 @@ def login():
         password = request.form['password']
         # Security:
         password = password + 'boatsAreCool' #Non random salting
-        password = hashlib.md5(password.encode()) #Encode password
+        password = hashlib.md5(password.encode()) #Hash password
         password = password.hexdigest() #convert password to string
         # verification:
         conn = psycopg2.connect(db)
@@ -231,6 +253,7 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
 
+
 ############### ---------- Run ---------- ###############
 if __name__ == "__main__":
     #Function to run on startup
@@ -238,6 +261,7 @@ if __name__ == "__main__":
     avgByCoun()
     donoutChart()
     app.run(debug=True)
+
 
 ############### ---------- Section ---------- ###############
 ##### ----- Subsection ----- #####
