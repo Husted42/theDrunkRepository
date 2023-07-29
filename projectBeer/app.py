@@ -10,7 +10,7 @@ from datetime import datetime
 import re
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as pltcd
 
 #scheduler
 import time
@@ -25,7 +25,7 @@ app = Flask(__name__)
 app.secret_key = 'OsmanAndJeppe'
 
 # Setup database: postgres
-db = "dbname='postgres' user='postgres' host='127.0.0.1' password = 'password'"
+db = "dbname='postgres' user='postgres' host='127.0.0.1' password = 'ostehaps'"
 
 
 ############### ---------- plots ---------- ###############

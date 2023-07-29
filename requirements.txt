@@ -1,0 +1,7 @@
+flask
+psycopg2
+datetime
+pandas
+numpy
+matplotlib
+apscheduler

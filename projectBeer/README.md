@@ -4,8 +4,7 @@ To deploy this project you need to have the modules
 - psycopg2
 
 ```bash
-$ pip install flask 
-$ pip install psycopg2
+$ pip install -r requirements.txt
 ```
 Run the files in sqlQueries in your database (pgadmin): 
 - insertData.sql

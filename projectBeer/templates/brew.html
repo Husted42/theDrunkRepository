@@ -38,14 +38,19 @@
 
 {% for n in Beer %}
 <div class="beerContainer">
-        <img src="/static/assets/{{ n[0] }}.png" alt="Brewery logo" width="100px" height="100px">
-        <p>
-          <!-- brewer  --> {{ n[0] }} 
-          <!-- name -->    {{ n[1] }} 
-          <!-- alc -->     {{ n[2] }} 
-          <!-- county -->  {{ n[3] }} 
-          <!-- rating -->  {{ n[4] }} 
-        </p>
+  <div class="item1">
+          <img src="/static/assets/flags/{{ n[3] }}.png" alt="Flag" width="150px" height="100px">
+  </div>
+  <div class="item2">
+          <img src="/static/assets/{{ n[0] }}.png" alt="Brewery logo" width="100px" height="100px">
+          <p>
+            <!-- brewer  --> {{ n[0] }}
+            <!-- name -->    {{ n[1] }} 
+            <!-- alc -->     {{ n[2] }} 
+            <!-- county -->  {{ n[3] }} 
+            <!-- rating -->  {{ n[4] }} 
+          </p>
+  </div>
 </div>
 {% endfor %}
 {% endblock content %}
