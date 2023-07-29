@@ -1,18 +1,81 @@
 /* ##-----## filter systems ##-----## */
 .filterSystem {
-    border: 1px solid #000000;
+display: flex;
+justify-content: space-between;
+align-items: flex-start; /* Align items to the top of the container */
+border: 1px solid #000000;
+padding: 40px; /* Add padding between the boxes */
 }
 
-.filterSystem1 {
-    border: 1px solid #757575;
+.filterSystem1,
+.filterSystem2 {
+border: 1px solid #757575;
+padding: 10px; /* Add padding to the form */
 }
 
-.filterSystem2{
-    border: 1px solid #757575;
+/* Style for form groups (fields in separate boxes) */
+.form-group {
+margin-bottom: 10px;
 }
-
 
 /* ##-----## print beers ##-----## */
-.beerContainer{
-    border: 1px solid #000000;
+.beerContainer {
+display: flex;
+align-items: stretch; /* Align items to have the same height */
+border: 1px solid #000000;
+width: 100%;
+margin-left: auto;
+margin-right: auto;
+padding: 10px; /* Add padding to the beer container */
+}
+
+.flag-logo-box {
+display: flex;
+align-items: stretch; /* Make the flag-logo-box stretch vertically */
+justify-content: space-between;
+border: 1px solid #757575;
+padding: 10px;
+width: 300px; /* Set a fixed width for this box */
+}
+
+.flag-logo-box img {
+margin-right: 10px; /* Add some space between the flag and logo */
+}
+
+.info-box {
+display: flex;
+flex-wrap: wrap; /* Allow items to wrap to the next line */
+flex: 1; /* Use all available space within the info-box */
+}
+
+/* Style for boxes */
+.brewer-box,
+.name-box,
+.alc-box,
+.country-box,
+.rating-box {
+border: 1px solid #757575;
+padding: 26px;
+flex: 1; /* Use all available space within the info-box */
+margin-right: 10px; /* Add some space between the boxes */
+margin-bottom: 0px;
+display: flex;
+flex-direction: column;
+}
+
+/* Style for field labels (e.g., 'name:', 'brewer:', etc.) */
+.label {
+font-size: 18px; /* Adjust font size as needed */
+font-weight: bold;
+}
+
+/* Style for field values (e.g., 'John Doe', '8', etc.) */
+.value {
+font-size: 24px; /* Adjust font size as needed */
+font-weight: bold;
+}
+
+/* Style for rating value (e.g., '8' in 'rating: 8') */
+.rating-value {
+font-size: 36px; /* Adjust font size for a bigger rating value */
 }
