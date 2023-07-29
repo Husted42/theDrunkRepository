@@ -63,7 +63,9 @@ def avgByCoun():
 def avgByBrew():
     df = createDataframe()
     keepers = df['brewer'].value_counts().reset_index()
-    keepers = keepers[keepers['count'] > 2]
+    print(keepers)
+    for elm in keepers: print(elm)
+    keepers = keepers[keepers['brewer'] > 2]
     keepers = list(keepers.pop('brewer'))
     keepers.remove('na')
 
@@ -230,6 +232,7 @@ def login():
         password = password + 'boatsAreCool' #Non random salting
         password = hashlib.md5(password.encode()) #Hash password
         password = password.hexdigest() #convert password to string
+        print(password)
         # verification:
         conn = psycopg2.connect(db)
         cursor = conn.cursor()
@@ -257,9 +260,9 @@ def logout():
 ############### ---------- Run ---------- ###############
 if __name__ == "__main__":
     #Function to run on startup
-    avgByBrew()
-    avgByCoun()
-    donoutChart()
+    #avgByBrew()
+    #avgByCoun()
+    #donoutChart()
     app.run(debug=True)
 
 
