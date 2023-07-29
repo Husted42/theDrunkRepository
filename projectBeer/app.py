@@ -20,13 +20,14 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 
 ############### ---------- Variables ---------- ###############
+orange_ = '#F78914'
 # Flask constructor
 app = Flask(__name__)
 
 app.secret_key = 'OsmanAndJeppe'
 
 # Setup database: postgres
-db = "dbname='postgres' user='postgres' host='127.0.0.1' password = 'ostehaps'"
+db = "dbname='postgres' user='postgres' host='127.0.0.1' password = 'password'"
 
 
 ############### ---------- plots ---------- ###############
@@ -56,9 +57,10 @@ def avgByCoun():
     y = list(df_avgByCoun.pop('country'))
     x = list(df_avgByCoun.pop('rating'))
     plt.figure(figsize=(10,6))
-    plt.barh(width=x, y=y, color = 'Blue')
+    plt.barh(width=x, y=y, color = orange_)
     plt.xlim(xRange)
-    plt.title("Average rating based on Country")
+    plt.xlabel('Rating', fontdict={'size': 20})
+    plt.title("Average rating based on Country", fontdict={'size': 20})
     plt.savefig('static/plots/avgByCoun.png', transparent=True)
 
 '''Saves a plot in static/plots/'''
@@ -79,23 +81,37 @@ def avgByBrew():
     x = list(df_avgByCoun.pop('brewer'))[-15:]
     y = list(df_avgByCoun.pop('rating'))[-15:]
     plt.figure(figsize=(10,6))
-    plt.bar(x=x, height=y, color = 'Blue')
-    plt.title("Average rating based on Brewer")
+    plt.bar(x=x, height=y, color = orange_)
+    plt.title("Average rating based on Brewer", fontdict={'size': 20})
     plt.ylim((5,10))
+    plt.ylabel('Rating', fontdict={'size': 20})
     plt.xticks(rotation = 45)
     plt.savefig('static/plots/avgByBrew.png', transparent=True)
 
 '''Saves a plot in static/plots/'''
 def donoutChart():
-    fig, ax = plt.subplots(figsize=(6, 3), subplot_kw=dict(aspect="equal"))
+    fig, ax = plt.subplots(figsize=(10, 6), subplot_kw=dict(aspect="equal"))
     data = createDataframe()
     data = data['country'].value_counts().reset_index()
     data = data.sort_values(by=['country'], ascending=False)
     data.loc[data['country'] < 3, 'index'] = "other"
     data = data.groupby(['index'])['country'].sum().reset_index()
     labels = list(data.pop('index'))
+    labels = list(map(str.capitalize, labels))
+
     count = list(data.pop('country'))
-    
+
+    #Add % for labels
+    total = sum(count)
+    lst = []
+    for elm in count:
+        per = elm / total
+        per = round(per, 2)
+        per = ' ' + str(per) + '%'
+        lst.append(per)
+    print(lst)
+    labels = [i + j for i, j in zip(labels, lst)]
+
     wedges, texts = ax.pie(count, wedgeprops=dict(width=0.5), startangle=-40)
 
     bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0.72)
@@ -112,7 +128,8 @@ def donoutChart():
         ax.annotate(labels[i], xy=(x, y), xytext=(1.35*np.sign(x), 1.4*y),
             horizontalalignment=horizontalalignment, **kw)
 
-    ax.set_title("Distribution of beer count by country", y=1.05)
+    
+    ax.set_title("Distribution of beer count by country", y=1.05, fontdict={'size': 20})
     plt.savefig('static/plots/donoutChart.png', transparent=True)
 
 
