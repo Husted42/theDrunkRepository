@@ -59,7 +59,7 @@ def avgByCoun():
     plt.barh(width=x, y=y, color = 'Blue')
     plt.xlim(xRange)
     plt.title("Average rating based on Country")
-    plt.savefig('static/plots/avgByCoun.png')
+    plt.savefig('static/plots/avgByCoun.png', transparent=True)
 
 '''Saves a plot in static/plots/'''
 def avgByBrew():
@@ -83,7 +83,7 @@ def avgByBrew():
     plt.title("Average rating based on Brewer")
     plt.ylim((5,10))
     plt.xticks(rotation = 45)
-    plt.savefig('static/plots/avgByBrew.png')
+    plt.savefig('static/plots/avgByBrew.png', transparent=True)
 
 '''Saves a plot in static/plots/'''
 def donoutChart():
@@ -113,7 +113,7 @@ def donoutChart():
             horizontalalignment=horizontalalignment, **kw)
 
     ax.set_title("Distribution of beer count by country", y=1.05)
-    plt.savefig('static/plots/donoutChart.png')
+    plt.savefig('static/plots/donoutChart.png', transparent=True)
 
 
 ############### ---------- Functions ---------- ###############
