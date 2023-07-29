@@ -1,0 +1,17 @@
+.main {
+    border: 1px solid #000000;
+    height: 600px;
+}
+
+.col_ {
+    float: left;
+    width: 50%;
+    padding: 5px;
+  }
+
+
+/*.avgBy{
+    display: block;
+    margin-left: 0;
+    margin-right: auto;
+} */

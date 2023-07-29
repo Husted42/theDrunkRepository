@@ -10,7 +10,8 @@ from datetime import datetime
 import re
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as pltcd
+import matplotlib.pyplot as plt
+from matplotlib import rcParams
 
 #scheduler
 import time
@@ -25,10 +26,11 @@ app = Flask(__name__)
 app.secret_key = 'OsmanAndJeppe'
 
 # Setup database: postgres
-db = "dbname='postgres' user='postgres' host='127.0.0.1' password = 'ostehaps'"
+db = "dbname='postgres' user='postgres' host='127.0.0.1' password = 'password'"
 
 
 ############### ---------- plots ---------- ###############
+rcParams.update({'figure.autolayout': True})
 ''' Turns Beer table into dataframe '''
 def createDataframe():
     conn = psycopg2.connect(db)
@@ -42,8 +44,8 @@ def createDataframe():
 def avgByCoun():
     df = createDataframe()
     keepers = df['country'].value_counts().reset_index()
-    keepers = keepers[keepers['count'] > 3]
-    keepers = list(keepers.pop('country'))
+    keepers = keepers[keepers['country'] > 3]
+    keepers = list(keepers.pop('index'))
 
     df_avgByCoun = df.groupby(['country'])['rating'].mean().reset_index()
     df_avgByCoun = df_avgByCoun[df_avgByCoun['country'].isin(keepers)]
@@ -66,7 +68,7 @@ def avgByBrew():
     print(keepers)
     for elm in keepers: print(elm)
     keepers = keepers[keepers['brewer'] > 2]
-    keepers = list(keepers.pop('brewer'))
+    keepers = list(keepers.pop('index'))
     keepers.remove('na')
 
     df_avgByCoun = df.groupby(['brewer'])['rating'].mean().reset_index()
@@ -88,11 +90,12 @@ def donoutChart():
     fig, ax = plt.subplots(figsize=(6, 3), subplot_kw=dict(aspect="equal"))
     data = createDataframe()
     data = data['country'].value_counts().reset_index()
-    data = data.sort_values(by=['count'], ascending=False)
-    data.loc[data['count'] < 3, 'country'] = "other"
-    data = data.groupby(['country'])['count'].sum().reset_index()
-    labels = list(data.pop('country'))
-    count = list(data.pop('count'))
+    data = data.sort_values(by=['country'], ascending=False)
+    data.loc[data['country'] < 3, 'index'] = "other"
+    data = data.groupby(['index'])['country'].sum().reset_index()
+    labels = list(data.pop('index'))
+    count = list(data.pop('country'))
+    
     wedges, texts = ax.pie(count, wedgeprops=dict(width=0.5), startangle=-40)
 
     bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0.72)
@@ -260,9 +263,9 @@ def logout():
 ############### ---------- Run ---------- ###############
 if __name__ == "__main__":
     #Function to run on startup
-    #avgByBrew()
-    #avgByCoun()
-    #donoutChart()
+    avgByCoun()
+    avgByBrew()
+    donoutChart()
     app.run(debug=True)
 
 
