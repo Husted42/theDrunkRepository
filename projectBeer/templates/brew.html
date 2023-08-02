@@ -13,22 +13,22 @@
       </select>
     </div>
     <div class="form-group">
-      <label for="alcPer">and an alcohol range:</label> <br>
+      <label for="alcPer">and an alcohol range:</label>
       <input type="text" name="alcPer" id="alcPer" readonly style="font-weight:bold; width: 100px;">
     </div>
 
-    <div id="slider-range" style="width: 200px;"></div>
-    <input type="submit" value="submit" placeholder="submit">
+    <div id="slider-range" class="slider-range" style="width: 200px;"></div> <br>
+    <div class="slider-range" style="width: 100px;"><input style="width: 100px;" " type="submit" value="submit" placeholder="submit"></div>
   </form>
 
   <!-- Search for breweries -->
   <div class="filterSystem2">
     <form method="POST">
       <div class="form-group">
-        <label for="breweries">Search for breweries:</label>
+        <label for="breweries">Search for breweries:</label> <br>
         <input id="breweries" type="text" name="breweries" placeholder="string" />
+        <input type="submit" value="submit" placeholder="submit">
       </div>
-      <input type="submit" value="submit" placeholder="submit">
     </form>
 
     <!-- Search for beers -->
@@ -36,8 +36,8 @@
       <div class="form-group">
         <label for="beerName">Search for beer names:</label>
         <input id="beerName" type="text" name="beerName" placeholder="string" />
+        <input type="submit" value="submit" placeholder="submit">
       </div>
-      <input type="submit" value="submit" placeholder="submit">
     </form>
   </div>
 </div>

@@ -41,10 +41,21 @@ def createDataframe():
     df = pd.DataFrame(df, columns = ['brewer', 'name', 'alc', 'country', 'rating', 'price'])
     return df
 
-'''Saves a plot in static/plots/'''
+''' Problem with column names, diffrent output on diffrent computers. '''
+def dataframeFix(inp):
+    if inp.keys()[0] == 'country':
+        inp.rename(columns = {'country' : 'index'}, inplace = True)
+        inp.rename(columns = {'count' : 'country'}, inplace = True)
+    if inp.keys()[0] == 'brewer':
+        inp.rename(columns = {'brewer' : 'index'}, inplace = True)
+        inp.rename(columns = {'count' : 'brewer'}, inplace = True)
+    return inp
+
+''' Saves a plot in static/plots/ '''
 def avgByCoun():
     df = createDataframe()
     keepers = df['country'].value_counts().reset_index()
+    keepers = dataframeFix(keepers)
     keepers = keepers[keepers['country'] > 3]
     keepers = list(keepers.pop('index'))
 
@@ -67,8 +78,7 @@ def avgByCoun():
 def avgByBrew():
     df = createDataframe()
     keepers = df['brewer'].value_counts().reset_index()
-    print(keepers)
-    for elm in keepers: print(elm)
+    keepers = dataframeFix(keepers)
     keepers = keepers[keepers['brewer'] > 2]
     keepers = list(keepers.pop('index'))
     keepers.remove('na')
@@ -93,9 +103,12 @@ def donoutChart():
     fig, ax = plt.subplots(figsize=(10, 6), subplot_kw=dict(aspect="equal"))
     data = createDataframe()
     data = data['country'].value_counts().reset_index()
+    data = dataframeFix(data)
     data = data.sort_values(by=['country'], ascending=False)
     data.loc[data['country'] < 3, 'index'] = "other"
     data = data.groupby(['index'])['country'].sum().reset_index()
+    data = dataframeFix(data)
+    print(data)
     labels = list(data.pop('index'))
     labels = list(map(str.capitalize, labels))
 
@@ -160,6 +173,9 @@ def getCountryCount():
     data = createDataframe()
     return data['country'].unique().size
 
+def getBeerCount():
+    data = createDataframe()
+    return len(data)
 
 ############### ---------- background scheduler ---------- ###############
 # Create a background scheduler, that runs every hour: 
@@ -179,7 +195,10 @@ atexit.register(lambda: scheduler.shutdown())
 ############### ---------- Routes ---------- ###############
 @app.route('/')
 def home():
-    return render_template('home.html')
+    diffBeer = getBeerCount()
+    diffBrew = getBrewerCount()
+    diffCoun = getCountryCount()
+    return render_template('home.html', diffBeer = diffBeer, diffBrew = diffBrew, diffCoun = diffCoun )
 
 @app.route("/brewers", methods=('GET', 'POST'))
 def brew():
