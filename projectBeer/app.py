@@ -302,7 +302,7 @@ if __name__ == "__main__":
     avgByCoun()
     avgByBrew()
     donoutChart()
-    app.run(host= '192.168.0.31', port=9000, debug=True)
+    app.run(host= '192.168.0.83', port=9000, debug=True)
 
 
 ############### ---------- Section ---------- ###############
