@@ -27,7 +27,7 @@ app = Flask(__name__)
 app.secret_key = 'OsmanAndJeppe'
 
 # Setup database: postgres
-db = "dbname='postgres' user='postgres' host='127.0.0.1' password = 'password'"
+db = "dbname='beers' user='postgres' host='127.0.0.1' password = 'password'"
 
 
 ############### ---------- plots ---------- ###############
@@ -234,7 +234,7 @@ def brew():
             return render_template('brew.html', Beer = Beer, country_table=country_table)
     return render_template('brew.html', Beer = Beer, country_table=country_table)
 
-@app.route("/admin", methods=('GET', 'POST'))
+@app.route("/ ", methods=('GET', 'POST'))
 def admin():
     if 'loggedin' in session:
         conn = psycopg2.connect(db)
@@ -302,7 +302,7 @@ if __name__ == "__main__":
     avgByCoun()
     avgByBrew()
     donoutChart()
-    app.run(host= '192.168.0.83', port=9000, debug=True)
+    app.run(host= '192.168.0.31', port=9000, debug=True)
 
 
 ############### ---------- Section ---------- ###############
