@@ -6,10 +6,36 @@ To deploy this project you need to have the modules
 ```bash
 $ pip install -r requirements.txt
 ```
-Run the files in sqlQueries in your database (pgadmin): 
-- insertData.sql
 
-After installing the modules and having all the files, run app.py: 
+# prerequisites
+### Install requirements
 ```bash
-$ python3 app.py
+$ pip install -r requirements.txt
 ```
+
+### Change psql authentication
+Postgres by default uses peer authentication meaning that it expect the user to have the same username as the system username. Lucikly this can easily be changed: 
+
+Locate the configuration file
+```
+sudo find / -name "pg_hba.conf"
+```
+
+Edit the file to use md5
+```
+sudo nano /etc/postgresql/<version>/main/pg_hba.conf
+```
+
+Change the following line:
+```
+local   all             postgres                                peer
+```
+to
+```
+local   all             postgres                                md5
+```
+
+### Create the database
+Create the database by running the script: `./beerdata.sh`
+ - You may need to mark is as an executable `chmod +x beerdata.sh`
+

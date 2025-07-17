@@ -19,7 +19,7 @@ INSERT INTO account(username, password) VALUES ('husted42', 'e177c5cfc7b27e9c4aa
 
 -- the FROM line should be changed, to match correct dir
 COPY Beer(brewer, name, alc, country, rating, price)
-FROM 'C:\Users\Public\new_data.csv'
+FROM '/home/husted42/Documents/github/theDrunkRepository/projectBeer/backupout.csv'
 DELIMITER ','
 CSV HEADER
 encoding 'latin1';
