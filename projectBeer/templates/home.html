@@ -1,38 +1,35 @@
 {% extends "layout.html" %}
 {% block content %}
-  <div class = "main">
-    <div class = "col_">   
-      <img src="static/plots/avgByCoun.png" class="avgBy" width="100%" height="80%" alt="">
+<div class="dashboard-container">
+  <!-- Top-left: avgByCoun -->
+  <div class="chart-box">
+    <img src="static/plots/avgByCoun.png" class="chart" alt="Average by Country">
+  </div>
+
+  <!-- Top-right: stats -->
+  <div class="stats-section">
+    <div class="stat-card">
+      <div class="stat-number">{{ diffBeer }}</div>
+      <div class="stat-label">Different Beers</div>
     </div>
-    <div class="result"> 
-      <div class="box_">
-        <h1 class="res_number"> 
-          {{ diffBeer }}
-        </h1>
-        <h1 class="res_title">
-          Different Beers
-        </h1>
-      </div>
-      <div class="box_">
-        <h1 class="res_number"> 
-          {{ diffBrew }}
-        </h1>
-        <h1 class="res_title">
-          Different breweries
-        </h1>
-      </div>
-      <div class="box_">
-        <h1 class="res_number"> 
-          {{ diffCoun }}
-        </h1>
-        <h1 class="res_title">
-          Different countries
-        </h1>
-      </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ diffBrew }}</div>
+      <div class="stat-label">Different Breweries</div>
     </div>
-    <img src="static/plots/donoutChart.png" class="donout" width="100%" height="80%" alt="">
-    <div class = "col_">  
-      <img src="static/plots/avgByBrew.png" class="avgBy" width="100%" height="80%" alt="">
+    <div class="stat-card">
+      <div class="stat-number">{{ diffCoun }}</div>
+      <div class="stat-label">Different Countries</div>
     </div>
   </div>
-  {% endblock content %}
+
+  <!-- Bottom-left: avgByBrew -->
+  <div class="chart-box">
+    <img src="static/plots/avgByBrew.png" class="chart" alt="Average by Brewery">
+  </div>
+
+  <!-- Bottom-right: donut chart -->
+  <div class="donut-chart">
+    <img src="static/plots/donoutChart.png" class="donut-img" alt="Donut Chart">
+  </div>
+</div>
+{% endblock content %}
