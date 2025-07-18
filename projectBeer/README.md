@@ -13,6 +13,10 @@ $ pip install -r requirements.txt
 $ pip install -r requirements.txt
 ```
 
+### Enviroment file
+Change the name of the env file to .env and update variables if needed.
+ - NOTE: It's important that there is no spaces, otherwise it will not work for the .sh script
+
 ### Change psql authentication
 Postgres by default uses peer authentication meaning that it expect the user to have the same username as the system username. Lucikly this can easily be changed: 
 

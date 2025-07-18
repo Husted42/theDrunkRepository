@@ -1,9 +1,14 @@
 #!/bin/bash
 
+# Export all variables from .env file
+set -a
+source .env
+set +a
+
 ##### ----- Gloval Variables ----- #####
 # Define your DB credentials
 DB_NAME="beerdb"
-DB_USER="postgres"
+DB_USER=$DB_USER
 DB_DEFAULT="postgres"
 CSV_PATH="/home/husted42/Documents/github/theDrunkRepository/projectBeer/backupout.csv"
 
@@ -54,7 +59,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 echo "Schema 'beerdata' created successfully."  
-2
+
 # Create the tables
 psql -U "$DB_USER" -d "$DB_NAME" -c "$create_beer_table"
 if [ $? -ne 0 ]; then

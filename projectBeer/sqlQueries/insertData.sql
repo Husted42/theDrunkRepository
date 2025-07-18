@@ -25,8 +25,11 @@ CSV HEADER
 encoding 'latin1';
 
 -- Table for dropdown form
+-- TODO : This should be updated automatically when new countries are added to the Beer table
 CREATE TABLE country_table AS
-SELECT DISTINCT country, CONCAT(UPPER(LEFT(country,1)),
-LOWER(RIGHT(country,LENGTH(country)-1)))
+SELECT DISTINCT 
+	country, 
+	CONCAT(UPPER(LEFT(country,1)),
+	LOWER(RIGHT(country,LENGTH(country)-1)))
 AS print FROM Beer 
 ORDER BY print ASC;
