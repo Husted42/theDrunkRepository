@@ -42,6 +42,16 @@ INSERT INTO beerdata.Users(username, password) VALUES (
 );
 "
 
+create_country_table="
+CREATE TABLE IF NOT EXISTS beerdata.country_table AS
+SELECT DISTINCT 
+	country, 
+	CONCAT(UPPER(LEFT(country,1)),
+	LOWER(RIGHT(country,LENGTH(country)-1)))
+AS print FROM beerdata.beer
+ORDER BY print ASC;
+"
+
 ##### ----- Run ----- #####
 # Create the database if it doesn't exist
 psql -U "$DB_USER" -d "$DB_DEFAULT" -c "CREATE DATABASE $DB_NAME;"
@@ -90,3 +100,11 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 echo "Data imported successfully from '$CSV_PATH'."
+
+# Create country table
+psql -U "$DB_USER" -d "$DB_NAME" -c "$create_country_table"
+if [ $? -ne 0 ]; then
+    echo "Country table could not be created."
+    exit 1
+fi
+echo "Country table created successfully."

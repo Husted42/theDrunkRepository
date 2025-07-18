@@ -135,7 +135,7 @@ def brew():
         SELECT 
             country,
             print
-        FROM country_table;
+        FROM {BEER_SCHEMA}.country_table;
     '''
     
     # Execute the queries
